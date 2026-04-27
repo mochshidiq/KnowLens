@@ -1,0 +1,6 @@
+filename,title,division,project,country,city,year,document_type,access_level,owner
+onboarding_it.txt,IT Onboarding Guide,IT,onboarding,Indonesia,Jakarta,2023,SOP,public,HR
+architecture_systemX.pdf,System X Architecture,IT,systemX,Japan,Tokyo,2024,technical,division,IT
+salary_structure.pdf,Salary Structure,HR,HR_policy,Indonesia,Jakarta,2023,policy,private,HR
+tutorial_pls_sem_2025.pdf,Tutorial PLS SEM,Research,PLS_SEM,Indonesia,Jakarta,2025,pdf,public,Research
+ta_km.pdf,TA Knowledge Management,Research,KM,Indonesia,Jakarta,2025,pdf,private,Research

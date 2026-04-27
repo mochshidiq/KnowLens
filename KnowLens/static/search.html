@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>KnowLens – Enterprise AI Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --accent: #6366f1;
+      --glass: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --bg-color: #f0f4ff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: #1e293b;
+      min-height: 100vh;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.1), transparent 40%),
+        linear-gradient(135deg, #f8faff 0%, #e2e8ff 100%);
+      background-attachment: fixed;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* DEKORASI LATAR BELAKANG (AI MESH & BRAIN) */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      /* Ilustrasi Jaringan AI & Otak Transparan */
+      background-image: 
+        url("data:image/svg+xml,%3Csvg width='1000' height='1000' viewBox='0 0 1000 1000' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M800 200 L950 400 M950 400 L850 600 M850 600 L700 800 M700 800 L500 700' stroke='%233b82f6' stroke-opacity='0.1'/%3E%3Ccircle cx='800' cy='200' r='5' fill='%233b82f6' fill-opacity='0.1'/%3E%3Ccircle cx='950' cy='400' r='8' fill='%233b82f6' fill-opacity='0.1'/%3E%3Ccircle cx='850' cy='600' r='6' fill='%233b82f6' fill-opacity='0.1'/%3E%3Cpath d='M100 300 Q150 150 300 150 Q450 150 500 300 Q500 450 350 450 Q200 450 100 300' stroke='%233b82f6' stroke-opacity='0.05' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+      z-index: -1;
+    }
+
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 1.2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .brand {
+      color: white; font-weight: 800; font-size: 1.5rem;
+      display: flex; align-items: center; gap: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    nav a {
+      color: #94a3b8; text-decoration: none; margin-left: 2.5rem;
+      font-weight: 600; transition: 0.3s; font-size: 0.95rem;
+    }
+
+    nav a:hover, nav a.active { color: white; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+    .container { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; }
+
+    /* MODERN CARDS */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.04);
+      transition: 0.3s ease;
+    }
+
+    .row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+
+    input, select {
+      background: white; border: 1.5px solid #e2e8f0;
+      padding: 14px 20px; border-radius: 14px; font-size: 1rem;
+      transition: 0.3s; color: #334155;
+    }
+
+    input:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    button#go {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white; border: none; font-weight: 700;
+      padding: 14px 35px; border-radius: 14px;
+      cursor: pointer; transition: 0.3s;
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    button#go:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4); }
+
+    .nlp-badge {
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      color: white; padding: 5px 12px; border-radius: 8px;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+    }
+
+    /* TATA LETAK HASIL PENCARIAN (DUA KOLOM) */
+    #results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .result-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 1.8rem;
+      transition: 0.3s;
+    }
+
+    .result-card:hover { transform: scale(1.02); background: white; }
+
+    .result-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 0.8rem; }
+    
+    .pill {
+      font-size: 11px; font-weight: 700; padding: 5px 14px;
+      border-radius: 50px; background: #f1f5f9; color: #475569;
+      text-transform: uppercase;
+    }
+    .pill-score { background: #dcfce7; color: #166534; }
+    .pill-blue { background: #e0e7ff; color: #3730a3; }
+
+    .active-session {
+      background: #1e293b; color: white; padding: 14px 25px;
+      border-radius: 16px; font-size: 14px; margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand"><span>🧠</span> KnowLens</div>
+  <nav>
+    <a href="search.html" class="active">Search</a>
+    <a href="answer.html">Answer</a>
+    <a href="upload.html">Upload</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="card" style="padding: 1rem 2.5rem; display: flex; align-items: center; justify-content: space-between;">
+    <div class="row">
+      <span style="font-size:12px; font-weight:800; color:#64748b; letter-spacing:1px;">PERSONA:</span>
+      <select id="username" style="border:none; background:transparent; font-weight:700; color:var(--primary); cursor:pointer;">
+        <option value="andi">Andi (Research)</option>
+        <option value="budi">Budi (IT)</option>
+        <option value="sari">Sari (HR)</option>
+      </select>
+    </div>
+    <div class="nlp-badge">NLP POWERED</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:1.5rem; margin-bottom:1.5rem;">🔍 Knowledge Discovery</h3>
+    <div class="row">
+      <input id="q" placeholder="What would you like to discover today?" style="flex:1;" />
+      <button id="go">Search</button>
+    </div>
+    <div class="row" style="margin-top:2rem">
+      <select id="division"><option value="">All Divisions</option><option>IT</option><option>HR</option><option>Research</option></select>
+      <select id="country"><option value="">Global Coverage</option><option>Indonesia</option><option>Japan</option></select>
+      <input id="year" placeholder="Year" style="width:140px" />
+    </div>
+  </div>
+
+  <div id="status-area"></div>
+  <div id="results-grid">
+     <div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 5rem 0;">
+       <p style="font-size: 1.1rem;">System ready for semantic knowledge retrieval.</p>
+     </div>
+  </div>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+document.getElementById('go').onclick = async () => {
+  const q = document.getElementById('q').value.trim();
+  const username = document.getElementById('username').value;
+  const division = document.getElementById('division').value;
+  const country = document.getElementById('country').value;
+  const year = document.getElementById('year').value;
+
+  if (!q) return;
+
+  const grid = document.getElementById('results-grid');
+  const status = document.getElementById('status-area');
+  
+  grid.innerHTML = "";
+  status.innerHTML = `<div class="card" style="text-align:center"><p>🧠 Analyzing semantic intent and scanning documents...</p></div>`;
+
+  let url = `${API}/search?q=${encodeURIComponent(q)}&username=${username}`;
+  if (division) url += `&division=${division}`;
+  if (country) url += `&country=${country}`;
+  if (year) url += `&year=${year}`;
+
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+
+    status.innerHTML = `
+      <div class="active-session">
+        <span>👤</span> <b>Active User:</b> ${j.user.username} | <b>Division:</b> ${j.user.division}
+      </div>
+    `;
+
+    grid.innerHTML = j.results.map(item => `
+      <div class="result-card">
+        <div class="result-title">${item.source}</div>
+        <div class="row" style="margin-bottom:1.2rem">
+          <span class="pill pill-score">Relevance: ${item.score.toFixed(3)}</span>
+          <span class="pill pill-blue">${item.division || 'General'}</span>
+          <span class="pill">${item.country || 'Global'}</span>
+          <span class="pill">${item.year || '-'}</span>
+        </div>
+        <p style="line-height:1.8; font-size:14px; color:#475569;">${item.snippet}</p>
+      </div>
+    `).join('');
+  } catch (err) {
+    status.innerHTML = `<div class="card" style="border: 2px solid #fecaca;"><p style="color:#dc2626; font-weight:bold;">⚠️ Connection Error: Please ensure your FastAPI backend is running.</p></div>`;
+  }
+};
+</script>
+
+</body>
+</html>

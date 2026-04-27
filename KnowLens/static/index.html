@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>KnowLens – KM Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { max-width: 900px; margin: 24px auto; font-family: system-ui; }
+    input, select, button { padding: 10px; font-size: 14px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 10px 0; }
+    .meta { font-size: 13px; color: #555; }
+    .title { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>🧠 KnowLens – Knowledge Search</h1>
+
+<!-- BUILD -->
+<section class="card">
+  <h3>Build Index</h3>
+  <button id="build">Build Index</button>
+  <div id="buildStatus" class="meta"></div>
+</section>
+
+<label>User:</label>
+<select id="username">
+  <option value="andi">Andi (Research)</option>
+  <option value="budi">Budi (IT)</option>
+  <option value="sari">Sari (HR)</option>
+</select>
+
+<!-- SEARCH -->
+<section class="card">
+  <h3>Search Knowledge</h3>
+
+  <div class="row">
+    <input id="q" placeholder="Search knowledge..." style="flex:1"/>
+    <button id="go">Search</button>
+  </div>
+
+  <div class="row" style="margin-top:10px">
+    <select id="division">
+      <option value="">All Division</option>
+      <option>IT</option>
+      <option>HR</option>
+      <option>Research</option>
+    </select>
+
+    <select id="country">
+      <option value="">All Country</option>
+      <option>Indonesia</option>
+      <option>Japan</option>
+    </select>
+
+    <input id="year" placeholder="Year (e.g. 2025)" style="width:120px"/>
+  </div>
+
+  <div id="results"></div>
+</section>
+
+<!-- ANSWER -->
+<section class="card">
+  <h3>AI Answer</h3>
+  <div class="row">
+    <input id="qa" placeholder="Ask a question..." style="flex:1"/>
+    <button id="ask">Answer</button>
+  </div>
+  <div id="ans"></div>
+</section>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+// ================= BUILD =================
+document.getElementById('build').onclick = async () => {
+  const el = document.getElementById('buildStatus');
+  el.textContent = "Building...";
+
+  const r = await fetch(`${API}/build`, { method:"POST" });
+  const j = await r.json();
+
+  el.textContent = "Done: " + JSON.stringify(j.stats);
+};
+
+// ================= SEARCH =================
+document.getElementById('go').onclick = async () => {
+  const q = document.getElementById('q').value.trim();
+  const division = document.getElementById('division').value;
+  const country = document.getElementById('country').value;
+  const year = document.getElementById('year').value;
+  const username = document.getElementById('username').value;
+
+  if (!q) return;
+
+  let url = `${API}/search?q=${encodeURIComponent(q)}&username=${username}`;
+
+  if (division) url += `&division=${division}`;
+  if (country) url += `&country=${country}`;
+  if (year) url += `&year=${year}`;
+
+  const box = document.getElementById('results');
+  box.innerHTML = "Searching...";
+
+  const r = await fetch(url);
+  const j = await r.json();
+
+  box.innerHTML = `
+    <p class="meta">
+      User: <b>${j.user.username}</b> (${j.user.division})
+    </p>
+  ` + j.results.map(item => `
+    <div class="card">
+      <div class="title">${item.source}</div>
+      <div class="meta">
+        Score: ${item.score.toFixed(3)} |
+        Division: ${item.division || '-'} |
+        Country: ${item.country || '-'} |
+        Year: ${item.year || '-'}
+      </div>
+      <p>${item.snippet}</p>
+    </div>
+  `).join('');
+};
+
+// ================= ANSWER =================
+document.getElementById('ask').onclick = async () => {
+  const q = document.getElementById('qa').value.trim();
+  const username = document.getElementById('username').value;
+  const box = document.getElementById('ans');
+
+  if (!q) return;
+
+  box.innerHTML = "Thinking...";
+
+  const r = await fetch(`${API}/answer?q=${encodeURIComponent(q)}&username=${username}`);
+  const j = await r.json();
+
+  box.innerHTML = `
+    <div class="card">
+      <strong>Answer:</strong>
+      <p>${j.answer}</p>
+      <div class="meta">Sources: ${j.sources.join(", ")}</div>
+    </div>
+  `;
+};
+</script>
+
+</body>
+</html>
