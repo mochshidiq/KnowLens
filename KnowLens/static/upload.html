@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>KnowLens Upload</title>
+</head>
+
+<body style="font-family: Arial; padding: 40px">
+
+<h2>📤 Upload Knowledge Documents</h2>
+
+<input type="file" id="files" multiple />
+<br><br>
+<button onclick="upload()">Upload</button>
+
+<p id="status"></p>
+
+<script>
+const API = "/api";
+
+async function upload() {
+    const files = document.getElementById("files").files;
+    if (!files.length) {
+        alert("Pilih file dulu!");
+        return;
+    }
+
+    const formData = new FormData();
+
+    for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+    }
+
+    document.getElementById("status").innerText = "Uploading...";
+
+    try {
+        const res = await fetch(`${API}/upload`, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        document.getElementById("status").innerText =
+            "✅ Upload sukses: " + data.uploaded.join(", ");
+
+    } catch (err) {
+        document.getElementById("status").innerText =
+            "❌ Upload gagal";
+    }
+}
+</script>
+
+</body>
+</html>
