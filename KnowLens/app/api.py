@@ -13,7 +13,7 @@ DOCS_DIR = "docs"
 DATA_DIR = "data"
 INDEX_PATH = os.path.join(DATA_DIR, "index.faiss")
 CHUNKS_PATH = os.path.join(DATA_DIR, "chunks.parquet")
-MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+MODEL_NAME = "all-MiniLM-L6-v2"
 
 os.makedirs(DOCS_DIR, exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
