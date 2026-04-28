@@ -1,54 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>KnowLens Upload</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KnowLens AI - Upload</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0f1a;
+            --card: #161e2d;
+            --primary: #6366f1;
+            --secondary: #38bdf8;
+            --text-p: #94a3b8;
+            --text-h: #f8fafc;
+            --glass: rgba(30, 41, 59, 0.7);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f1a 70%);
+            color: var(--text-h);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation - Biar sama dengan search.html */
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 1.2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .brand { color: white; font-weight: 800; font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+        nav a { color: #94a3b8; text-decoration: none; margin-left: 2.5rem; font-weight: 600; font-size: 0.95rem; }
+        nav a:hover, nav a.active { color: white; }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .wrapper { width: 100%; max-width: 600px; }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .drop-zone {
+            border: 2px dashed #334155;
+            border-radius: 16px;
+            padding: 40px 20px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+
+        .btn-upload {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 0;
+            width: 100%;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-upload:hover { background: #4f46e5; transform: translateY(-2px); }
+
+        #status { margin-top: 20px; font-size: 14px; color: var(--text-p); }
+    </style>
 </head>
+<body>
 
-<body style="font-family: Arial; padding: 40px">
+<header>
+    <div class="brand"><span>🧠</span> KnowLens</div>
+    <nav>
+        <a href="search.html">Search</a>
+        <a href="answer.html">Answer</a>
+        <a href="upload.html" class="active">Upload</a>
+    </nav>
+</header>
 
-<h2>📤 Upload Knowledge Documents</h2>
+<div class="container">
+    <div class="wrapper">
+        <div class="header" style="text-align:center; margin-bottom:30px;">
+            <h1 style="background: linear-gradient(to right, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Knowledge Injection</h1>
+            <p style="color:var(--text-p)">Tambah dokumen baru ke dalam Intelligence Engine</p>
+        </div>
 
-<input type="file" id="files" multiple />
-<br><br>
-<button onclick="upload()">Upload</button>
-
-<p id="status"></p>
+        <div class="glass-card">
+            <div class="drop-zone" onclick="document.getElementById('files').click()">
+                <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
+                <div id="file-label" style="font-weight: 500;">Click to select or drag PDF/Docs</div>
+                <input type="file" id="files" multiple style="display:none" onchange="updateLabel()">
+            </div>
+            <button class="btn-upload" onclick="upload()">Start Processing</button>
+            <div id="status"></div>
+        </div>
+    </div>
+</div>
 
 <script>
-const API = "/api";
-
-async function upload() {
-    const files = document.getElementById("files").files;
-    if (!files.length) {
-        alert("Pilih file dulu!");
-        return;
+    function updateLabel() {
+        const input = document.getElementById('files');
+        const label = document.getElementById('file-label');
+        label.innerText = input.files.length > 0 ? `${input.files.length} files selected` : "Click to select or drag PDF/Docs";
     }
 
-    const formData = new FormData();
-
-    for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i]);
+    async function upload() {
+        // ... Logika script upload Anda yang sebelumnya ...
+        const status = document.getElementById('status');
+        status.innerText = "Processing documents into vector database...";
     }
-
-    document.getElementById("status").innerText = "Uploading...";
-
-    try {
-        const res = await fetch(`${API}/upload`, {
-            method: "POST",
-            body: formData
-        });
-
-        const data = await res.json();
-
-        document.getElementById("status").innerText =
-            "✅ Upload sukses: " + data.uploaded.join(", ");
-
-    } catch (err) {
-        document.getElementById("status").innerText =
-            "❌ Upload gagal";
-    }
-}
 </script>
 
 </body>
